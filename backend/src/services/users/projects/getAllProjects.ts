@@ -1,10 +1,16 @@
 import { Request, Response } from "express";
-import redisClient from "../redis/redisClient";
-import prisma from "../config/prismaClient";
-import { CACHE_KEY } from "../config/types";
+import redisClient from "../../../redis/redisClient";
+import { CACHE_KEY } from "../../../config/types";
+import prisma from "../../../config/prismaClient";
+
 
 export const getAllProjects = async (req: Request, res: Response) => {
   try {
+
+        // add zod validation
+
+
+        
     const cached = await redisClient.get(CACHE_KEY);
 
     if (cached) {

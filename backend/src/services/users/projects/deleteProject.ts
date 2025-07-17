@@ -1,9 +1,9 @@
 
 import { Request, Response } from "express";
-import prisma from "../../config/prismaClient";
-import redisClient from "../../redis/redisClient";
-import { CACHE_KEY, KAFKA_PROJECT_EVENTS, PROJECT_STATUS } from "../../config/types";
-import { emitProjectEvent } from "../../kafka/producer";   
+import prisma from "../../../config/prismaClient";
+import redisClient from "../../../redis/redisClient";
+import { CACHE_KEY, KAFKA_PROJECT_EVENTS, PROJECT_STATUS } from "../../../config/types";
+import { emitProjectEvent } from "../../../kafka/producer";   
 
 
 
@@ -11,6 +11,11 @@ import { emitProjectEvent } from "../../kafka/producer";
 export const deleteProject = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+
+        // add zod validation
+
+
+        
     const deletedProject = await prisma.project.update({
       where: { id },
       data: { status: PROJECT_STATUS.INACTIVE },

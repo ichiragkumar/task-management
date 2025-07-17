@@ -1,11 +1,22 @@
 
 import express from "express";
 
+import {
+  getAllProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+} from "../services/users/projects";
 
-import { updateProject } from "../services/users/updateProject";
-import { getAllProjects } from "../services/users/getAllProjects";
-import { createProject } from "../services/users/createProject";
-import { deleteProject } from "../services/users/deleteProject";
+
+import {
+  createTask,
+  updateTask,
+  deleteTask,
+  getAllTasks,
+  getAllTasksByProjectId,
+} from "../services/users/tasks"; 
+
 
 const userRouter = express.Router();
 
@@ -18,7 +29,7 @@ userRouter.post("/projects:id/delete", deleteProject);
 
 userRouter.get("/projectId/:id/tasks", getAllTasksByProjectId);
 userRouter.post("/projects/:id/tasks",createTask);
-userRouter.post("/projects/:id:/tasks", updateTask);
+userRouter.post("/projects/:id/tasks/:taskId", updateTask);
 userRouter.post("/projects/:id/tasks", deleteTask);
 
 

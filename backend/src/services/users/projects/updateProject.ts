@@ -1,12 +1,17 @@
-import prisma from "../../config/prismaClient";
-import { CACHE_KEY, KAFKA_PROJECT_EVENTS } from "../../config/types";
-import { emitProjectEvent } from "../../kafka/producer";
-import redisClient from "../../redis/redisClient";
+import prisma from "../../../config/prismaClient";
+import { CACHE_KEY, KAFKA_PROJECT_EVENTS } from "../../../config/types";
+import { emitProjectEvent } from "../../../kafka/producer";
+import redisClient from "../../../redis/redisClient";
 import { Request, Response } from "express";
 
 export const updateProject = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+
+        // add zod validation
+
+
+        
     const updatedProject = await prisma.project.update({
       where: { id },
       data: req.body,
