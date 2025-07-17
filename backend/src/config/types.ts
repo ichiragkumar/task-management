@@ -6,4 +6,15 @@ export enum KAFKA_PROJECT_EVENTS {
     ACTIVE = 'ACTIVE',
     INACTIVE = 'INACTIVE',
     DELETED = 'DELETED',
+    UPDATED = 'UPDATED'
+}
+
+export const CACHE_KEY = 'projects';
+
+
+export enum PROJECT_STATUS {
+    PENDING = 'PENDING',
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE',
+    COMPLETED = 'COMPLETED'
 }

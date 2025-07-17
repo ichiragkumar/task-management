@@ -15,3 +15,4 @@ export const connectToRedisClient = async () => {
     await redisClient.connect();
 }
 
+export default redisClient;
