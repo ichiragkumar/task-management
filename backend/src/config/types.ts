@@ -1,0 +1,9 @@
+
+
+
+export enum KAFKA_PROJECT_EVENTS {
+    CREATED = 'CREATED',
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE',
+    DELETED = 'DELETED',
+}
