@@ -5,7 +5,7 @@ import { Role } from '../generated/prisma';
 
 
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+const JWT_SECRET = process.env.JWT_SECRET!
 
 export interface AuthRequest extends Request {
   user?: {
@@ -14,7 +14,7 @@ export interface AuthRequest extends Request {
   };
 }
 
-// Basic token check
+
 export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
@@ -50,6 +50,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
 export const authorize = (roles: Role[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
+      console.log("req.user", req.user)
       return res.status(403).json({ message: 'Forbidden: Insufficient role' });
     }
     next();
