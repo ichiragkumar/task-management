@@ -1,9 +1,10 @@
 
 
 import { Request, Response } from "express";
-import prisma from "../../config/prismaClient";
-import redisClient from "../../redis/redisClient";
-import { CACHE_KEY } from "../../config/types";
+import { CACHE_KEY } from "../../../config/types";
+import prisma from "../../../config/prismaClient";
+import redisClient from "../../../redis/redisClient";
+
 
 export const getAllTasks = async (req: Request, res: Response) => {
   try {

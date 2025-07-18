@@ -24,5 +24,25 @@ export enum PROJECT_STATUS {
     PENDING = 'PENDING',
     ACTIVE = 'ACTIVE',
     INACTIVE = 'INACTIVE',
+    COMPLETED = 'COMPLETED',
+    IN_PROGRESS = 'IN_PROGRESS'
+}
+export enum Role {
+    USER = 'USER',
+    ADMIN = 'ADMIN'
+}
+
+export enum USER_STATUS {
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE',
+    BANNED = 'BANNED',
+    DELETED = 'DELETED'
+}
+
+export enum TASK_STATUS {
+    PENDING = 'PENDING',
+    ACTIVE = 'ACTIVE',
+    ARCHIVED = 'ARCHIVED',
+    INACTIVE = 'INACTIVE',
     COMPLETED = 'COMPLETED'
 }

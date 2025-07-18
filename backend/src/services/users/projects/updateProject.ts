@@ -20,6 +20,7 @@ export const updateProject = async (req: Request, res: Response) => {
     await emitProjectEvent(KAFKA_PROJECT_EVENTS.UPDATED, updatedProject);
     res.status(200).json(updatedProject);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal Server Error: updateProject" });
   }
 };

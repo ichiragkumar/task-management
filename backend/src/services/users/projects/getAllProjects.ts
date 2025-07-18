@@ -18,10 +18,14 @@ export const getAllProjects = async (req: Request, res: Response) => {
     }
 
     const projects = await prisma.project.findMany();
+    if (!projects) {
+      return res.status(404).json({ error: "No projects found" });
+    }
     await redisClient.setEx(CACHE_KEY, 60, JSON.stringify(projects));
 
     return res.json(projects);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal Server Error: getAllProjects" });
   }
 };
