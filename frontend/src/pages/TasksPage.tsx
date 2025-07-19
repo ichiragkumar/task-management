@@ -53,13 +53,16 @@ const TasksPage = () => {
   const updateMutation = useMutation({
     mutationFn: async ({
       id,
+      projectId,
       name,
       status,
     }: {
       id: string;
+      projectId: string;
       name?: string;
       status?: string;
-    }) => updateTask("", id, { name, status }), // projectId will be handled by backend
+    }) => updateTask(projectId, id, { name, status }),
+
     onSuccess: () => {
       toast({
         title: "Success",
@@ -77,7 +80,9 @@ const TasksPage = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => deleteTask("", id), // projectId will be handled by backend
+  mutationFn: ({ id, projectId }: { id: string; projectId: string }) =>
+  deleteTask(projectId, id),
+
     onSuccess: () => {
       toast({
         title: "Success",
@@ -153,11 +158,12 @@ const TasksPage = () => {
       }
     });
 
-  const handleDeleteTask = (taskId: string, taskName: string) => {
-    if (confirm(`Are you sure you want to delete "${taskName}"?`)) {
-      deleteMutation.mutate(taskId);
-    }
-  };
+  const handleDeleteTask = (task: Task) => {
+  if (confirm(`Are you sure you want to delete "${task.name}"?`)) {
+    deleteMutation.mutate({ id: task.id, projectId: task.projectId });
+  }
+};
+
 
   const taskStats = {
     total: tasks.length,
@@ -382,6 +388,8 @@ const TasksPage = () => {
                                   updateMutation.mutate({
                                     id: task.id,
                                     name: editingTask.name,
+                                    projectId: task.projectId,
+
                                   });
                                 }
                               }}
@@ -434,6 +442,8 @@ const TasksPage = () => {
                                 id: task.id,
                                 name: editingTask.name,
                                 status: editingTask.status,
+                                projectId: task.projectId,
+
                               })
                             }
                             disabled={updateMutation.isPending}
@@ -460,7 +470,7 @@ const TasksPage = () => {
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() => handleDeleteTask(task.id, task.name)}
+                            onClick={() => handleDeleteTask(task)}
                             disabled={deleteMutation.isPending}
                           >
                             <Trash2 className="w-4 h-4" />

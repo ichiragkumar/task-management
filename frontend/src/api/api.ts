@@ -84,5 +84,5 @@ export const updateTask = (
 export const deleteTask = (projectId: string, taskId: string) =>
   API.delete(`/projects/${projectId}/tasks/${taskId}`);
 
-// Export API instance for direct use if needed
+
 export default API;
