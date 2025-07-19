@@ -13,6 +13,13 @@ API.interceptors.request.use((config) => {
 
 export const signup = (data: any) => API.post("/users/signup", data);
 export const signin = (data: any) => API.post("/users/signin", data);
+
+export const getMyProfile = () => API.get("/users/me");
+
+export const updateProfile = (data: any) =>
+  API.put("/users/update-profile", data);
+
+
 export const createProject = (data: any) => API.post("/projects", data);
 export const updateProject = (id: string, data: any) =>
   API.put(`/projects/${id}`, data);
