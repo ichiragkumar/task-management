@@ -8,10 +8,7 @@ export const updateProject = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-        // add zod validation
-
-
-        
+    // add zod validation
     const updatedProject = await prisma.project.update({
       where: { id },
       data: req.body,
@@ -20,7 +17,6 @@ export const updateProject = async (req: Request, res: Response) => {
     await emitProjectEvent(KAFKA_PROJECT_EVENTS.UPDATED, updatedProject);
     res.status(200).json(updatedProject);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Internal Server Error: updateProject" });
   }
 };

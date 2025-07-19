@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import redisClient from "../../../redis/redisClient";
-import { CACHE_KEY } from "../../../config/types";
+import { CACHE_KEY, PROJECT_STATUS } from "../../../config/types";
 import prisma from "../../../config/prismaClient";
 
 export const getAllProjects = async (req: Request, res: Response) => {
@@ -16,7 +16,16 @@ export const getAllProjects = async (req: Request, res: Response) => {
     }
 
 
-    const projects = await prisma.project.findMany();
+    const projects = await prisma.project.findMany({
+      where: {
+        status: {
+          not: PROJECT_STATUS.INACTIVE,
+        },
+      },
+      include: {
+        tasks: true,
+      },
+    });
 
     if (!projects || projects.length === 0) {
       return res.status(404).json({ error: "No projects found" });

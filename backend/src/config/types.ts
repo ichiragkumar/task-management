@@ -22,7 +22,6 @@ export const CACHE_KEY_TASKS = 'tasks';
 
 export enum PROJECT_STATUS {
     PENDING = 'PENDING',
-    ACTIVE = 'ACTIVE',
     INACTIVE = 'INACTIVE',
     COMPLETED = 'COMPLETED',
     IN_PROGRESS = 'IN_PROGRESS'

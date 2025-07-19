@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
@@ -8,6 +7,7 @@ import { Pencil, Trash2, Plus, ChevronDown, ChevronRight } from "lucide-react";
 import ProjectForm from "../components/ProjectForm";
 import TaskList from "../components/TaskList";
 
+import { getAllProjects, deleteProject } from "../api/api";
 
 interface Project {
   id: string;
@@ -21,25 +21,20 @@ const ProjectsPage = () => {
   const [editing, setEditing] = useState<Project | null>(null);
   const [expandedProjectId, setExpandedProjectId] = useState<string | null>(null);
 
-  // Fetch all projects
+
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["projects"],
-    queryFn: async () => {
-      const res = await axios.get("/projects");
-      return Array.isArray(res.data) ? res.data : [];
-    },
+    queryFn: getAllProjects,
   });
 
-
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => axios.delete(`/projects/${id}`),
+    mutationFn: async (id: string) => deleteProject(id),
     onSuccess: () => {
       toast.success("Project deleted");
       queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
     onError: () => toast.error("Failed to delete project"),
   });
-
 
   const toggleExpand = (id: string) => {
     setExpandedProjectId((prev) => (prev === id ? null : id));
