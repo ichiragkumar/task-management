@@ -30,6 +30,6 @@ projectRouter.put('/:projectId/tasks/:taskId', authenticate, authorize([Role.ADM
 projectRouter.delete('/:projectId/tasks/:taskId', authenticate, authorize([Role.ADMIN]), deleteTask);
 
 
-projectRouter.get("/tasks", authenticate, authorize([Role.USER]), getAllTasks);
+projectRouter.get("/tasks", authenticate, authorize([Role.ADMIN, Role.USER]), getAllTasks);
 
 export default projectRouter;
