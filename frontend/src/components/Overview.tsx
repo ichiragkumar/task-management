@@ -1,8 +1,15 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { getAllProjects, getAllTasks } from "../api/api";
-
 
 const Overview = () => {
   const { data: projects = [] } = useQuery<any[]>({
@@ -18,9 +25,7 @@ const Overview = () => {
     },
   });
 
-  const [stats, setStats] = useState<any[]>([]);
-
-  useEffect(() => {
+  const stats = useMemo(() => {
     const statusCount = {
       Project: {
         PENDING: 0,
@@ -45,21 +50,20 @@ const Overview = () => {
         statusCount.Project[p.status as keyof typeof statusCount.Project]++;
       }
     });
+
     taskList.forEach((t: any) => {
       if (t.status in statusCount.Task) {
         statusCount.Task[t.status as keyof typeof statusCount.Task]++;
       }
     });
 
-    const chartData = (Object.keys(statusCount) as Array<keyof typeof statusCount>).flatMap((type) =>
+    return (Object.keys(statusCount) as Array<keyof typeof statusCount>).flatMap((type) =>
       Object.entries(statusCount[type]).map(([status, count]) => ({
         type,
         status,
         count,
       }))
     );
-
-    setStats(chartData);
   }, [projects, tasks]);
 
   return (

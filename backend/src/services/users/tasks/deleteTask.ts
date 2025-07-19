@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 import prisma from "../../../config/prismaClient";
 import { emitProjectTaskEvent } from "../../../kafka/producer";
-import { CACHE_KEY, KAFKA_PROJECT_TASKS_EVENTS } from "../../../config/types";
+import { CACHE_KEY_TASKS, KAFKA_PROJECT_TASKS_EVENTS } from "../../../config/types";
 import redisClient from "../../../redis/redisClient";
 
 
@@ -25,7 +25,7 @@ export const deleteTask = async (req: Request, res: Response) => {
     const task = await prisma.task.delete({
       where: { id: taskId },
     });
-    await redisClient.del(CACHE_KEY);
+    await redisClient.del(CACHE_KEY_TASKS);
     await emitProjectTaskEvent(KAFKA_PROJECT_TASKS_EVENTS.INACTIVE, task);
     res.status(200).json(task);
   } catch (error) {

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../../../config/prismaClient";
 import { emitProjectTaskEvent } from "../../../kafka/producer";
-import { CACHE_KEY, KAFKA_PROJECT_TASKS_EVENTS } from "../../../config/types";
+import { CACHE_KEY_TASKS, KAFKA_PROJECT_TASKS_EVENTS } from "../../../config/types";
 import redisClient from "../../../redis/redisClient";
 
 export const updateTask = async (req: Request, res: Response) => {
@@ -24,7 +24,7 @@ export const updateTask = async (req: Request, res: Response) => {
       where: { id: taskId },
       data: req.body,
     });
-    await redisClient.del(CACHE_KEY);
+    await redisClient.del(CACHE_KEY_TASKS);
     await emitProjectTaskEvent(KAFKA_PROJECT_TASKS_EVENTS.UPDATED, task);
     res.status(200).json(task);
   } catch (error) {

@@ -7,6 +7,7 @@ import ProjectsPage from "./pages/ProjectsPage";
 import Overview from "./components/Overview";
 import Navbar from "./components/Navbar";
 import ProfileForm from "./components/ProfileForm";
+import ProjectDetailsPage from "./pages/ProjectDetailsPage";
 
 export default function App() {
 
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/overview" element={<Overview />} />
           <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/:projectId" element={<ProjectDetailsPage />} />
           <Route path="/profile" element={<ProfileForm />} />
         </Route>
       </Routes>

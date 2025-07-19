@@ -27,12 +27,16 @@ export const deleteProject = (id: string) => API.delete(`/projects/${id}`);
 
 export const getTasksByProjectId = (id: string) =>
   API.get(`/projects/${id}/tasks`);
+
 export const createTask = (projectId: string, data: any) =>
   API.post(`/projects/${projectId}/tasks`, data);
+
 export const updateTask = (projectId: string, taskId: string, data: any) =>
   API.put(`/projects/${projectId}/tasks/${taskId}`, data);
+
 export const deleteTask = (projectId: string, taskId: string) =>
   API.delete(`/projects/${projectId}/tasks/${taskId}`);
+
 
 export const getAllProjects = async () => {
   const res = await API.get("/projects");

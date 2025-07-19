@@ -3,11 +3,11 @@
 import { Request, Response } from "express";
 import prisma from "../../../config/prismaClient";
 import { emitProjectTaskEvent } from "../../../kafka/producer";
-import { CACHE_KEY, KAFKA_PROJECT_TASKS_EVENTS } from "../../../config/types";
+import { CACHE_KEY_TASKS, KAFKA_PROJECT_TASKS_EVENTS } from "../../../config/types";
 import redisClient from "../../../redis/redisClient";
 export const createTask = async (req: Request, res: Response) => {
     try{
-        // add zod validation
+
         const { id } = req.params;
         
 
@@ -21,7 +21,7 @@ export const createTask = async (req: Request, res: Response) => {
             return;
         }
         const task = await prisma.task.create({ data: req.body });
-        await redisClient.del(CACHE_KEY);
+        await redisClient.del(CACHE_KEY_TASKS);
         await emitProjectTaskEvent(KAFKA_PROJECT_TASKS_EVENTS.CREATED, task);
         res.status(201).json(task);
     }catch(error){

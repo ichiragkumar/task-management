@@ -18,7 +18,7 @@ export enum KAFKA_PROJECT_TASKS_EVENTS {
 
 
 export const CACHE_KEY = 'projects';
-
+export const CACHE_KEY_TASKS = 'tasks';
 
 export enum PROJECT_STATUS {
     PENDING = 'PENDING',
