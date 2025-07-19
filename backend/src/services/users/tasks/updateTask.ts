@@ -6,28 +6,37 @@ import redisClient from "../../../redis/redisClient";
 
 export const updateTask = async (req: Request, res: Response) => {
   try {
-    const { id, taskId } = req.params;
+    const { projectId, taskId } = req.params;
 
-    // add zod validation
+    const {  status } = req.body;
 
-    const ProjectIdExists = await prisma.project.findUnique({
-      where: {
-        id: id,
-      },
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
     });
-    if (ProjectIdExists) {
-      res.status(404).json({ error: "Project not found" });
-      return;
+
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
     }
 
-    const task = await prisma.task.update({
+    const taskExists = await prisma.task.findUnique({
       where: { id: taskId },
-      data: req.body,
     });
+
+    if (!taskExists || taskExists.projectId !== projectId) {
+      return res.status(404).json({ error: "Task not found for the given project" });
+    }
+
+    const updatedTask = await prisma.task.update({
+      where: { id: taskId },
+      data: { status },
+    });
+
     await redisClient.del(CACHE_KEY_TASKS);
-    await emitProjectTaskEvent(KAFKA_PROJECT_TASKS_EVENTS.UPDATED, task);
-    res.status(200).json(task);
+    await emitProjectTaskEvent(KAFKA_PROJECT_TASKS_EVENTS.UPDATED, updatedTask);
+
+    return res.status(200).json(updatedTask);
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error: updateTask" });
+    console.error("Error updating task:", error);
+    return res.status(500).json({ error: "Internal Server Error: updateTask" });
   }
 };

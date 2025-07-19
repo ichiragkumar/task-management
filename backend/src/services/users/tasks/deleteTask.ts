@@ -4,26 +4,33 @@ import prisma from "../../../config/prismaClient";
 import { emitProjectTaskEvent } from "../../../kafka/producer";
 import { CACHE_KEY_TASKS, KAFKA_PROJECT_TASKS_EVENTS } from "../../../config/types";
 import redisClient from "../../../redis/redisClient";
+import { TaskStatus } from "../../../generated/prisma";
 
 
 export const deleteTask = async (req: Request, res: Response) => {
   try {
-    const { id, taskId } = req.params;
+    const { projectId, taskId } = req.params;
 
-    // add zod validation
 
     const ProjectIdExists = await prisma.project.findUnique({
       where: {
-        id,
+        id : projectId,
       },
     });
-    if (ProjectIdExists) {
+
+    console.log("ProjectIdExists", ProjectIdExists);
+
+
+    if (!ProjectIdExists) {
       res.status(404).json({ error: "Project not found" });
       return;
     }
 
-    const task = await prisma.task.delete({
+
+
+    const task = await prisma.task.update({
       where: { id: taskId },
+      data: { status: TaskStatus.ARCHIVED },
     });
     await redisClient.del(CACHE_KEY_TASKS);
     await emitProjectTaskEvent(KAFKA_PROJECT_TASKS_EVENTS.INACTIVE, task);

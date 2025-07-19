@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { CACHE_KEY_TASKS } from "../../../config/types";
+import { CACHE_KEY_TASKS, TASK_STATUS } from "../../../config/types";
 import prisma from "../../../config/prismaClient";
 import redisClient from "../../../redis/redisClient";
 
 export const getAllTasks = async (req: Request, res: Response) => {
   try {
+
     const cached = await redisClient.get(CACHE_KEY_TASKS);
     console.log("Cache for tasks:", cached);
 
@@ -18,12 +19,18 @@ export const getAllTasks = async (req: Request, res: Response) => {
       }
     }
 
-    const tasks = await prisma.task.findMany();
+    console.log("Cache not found or invalid, fetching from DB");
+
+
+    const tasks = await prisma.task.findMany({});
+
+    console.log("Tasks from DB", tasks);
 
     if (!tasks || tasks.length === 0) {
       return res.status(404).json({ error: "No tasks found" });
     }
 
+    // Store in cache
     await redisClient.setEx(CACHE_KEY_TASKS, 60, JSON.stringify(tasks));
 
     return res.status(200).json({
@@ -31,6 +38,7 @@ export const getAllTasks = async (req: Request, res: Response) => {
       tasks,
     });
   } catch (error) {
+    console.error("Error in getAllTasks:", error);
     res.status(500).json({ error: "Internal Server Error: getAllTasks" });
   }
 };

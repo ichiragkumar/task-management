@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import prisma from "../../../config/prismaClient";
 
 export const createAccount = async (req: Request, res: Response) => {
-  const { email, password, role } = req.body;
+  const { email, password, role , name} = req.body;
 
   try {
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -15,7 +15,8 @@ export const createAccount = async (req: Request, res: Response) => {
 
     const user = await prisma.user.create({
       data: {
-        email,
+        name : name,
+        email: email,
         password: hashedPassword,
         role : role,
       },
@@ -23,6 +24,7 @@ export const createAccount = async (req: Request, res: Response) => {
 
     res.status(201).json({ message: "Account created", user });
   } catch (err) {
+    console.log("Error in createAccount:", err);
     res.status(500).json({ error: "Internal Server Error: createAccount" });
   }
 };

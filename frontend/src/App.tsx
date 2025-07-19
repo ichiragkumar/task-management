@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import ProjectsPage from "./pages/ProjectsPage";
+import TasksPage from "./pages/TasksPage";
 import Overview from "./components/Overview";
 import Navbar from "./components/Navbar";
 import ProfileForm from "./components/ProfileForm";
@@ -22,6 +23,7 @@ export default function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/overview" element={<Overview />} />
             <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/tasks" element={<TasksPage />} />
             <Route
               path="/projects/:projectId"
               element={<ProjectDetailsPage />}

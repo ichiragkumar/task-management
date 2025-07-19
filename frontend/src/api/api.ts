@@ -1,9 +1,8 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
-
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -11,31 +10,37 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-export const signup = (data: any) => API.post("/users/signup", data);
-export const signin = (data: any) => API.post("/users/signin", data);
+// Response interceptor for better error handling
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
+
+// User/Auth APIs
+export const signup = (data: {
+  name: string;
+  email: string;
+  password: string;
+}) => API.post("/users/signup", data);
+
+export const signin = (data: { email: string; password: string }) =>
+  API.post("/users/signin", data);
 
 export const getMyProfile = () => API.get("/users/me");
 
-export const updateProfile = (data: any) =>
-  API.put("/users/update-profile", data);
+export const updateProfile = (data: {
+  name?: string;
+  email?: string;
+  password?: string;
+}) => API.put("/users/update-profile", data);
 
-
-export const createProject = (data: any) => API.post("/projects", data);
-export const updateProject = (id: string, data: any) =>
-  API.put(`/projects/${id}`, data);
-export const deleteProject = (id: string) => API.delete(`/projects/${id}`);
-
-export const getTasksByProjectId = (id: string) =>
-  API.get(`/projects/${id}/tasks`);
-
-export const createTask = (projectId: string, data: any) =>
-  API.post(`/projects/${projectId}/tasks`, data);
-
-export const updateTask = (projectId: string, taskId: string, data: any) =>
-  API.put(`/projects/${projectId}/tasks/${taskId}`, data);
-
-export const deleteTask = (projectId: string, taskId: string) =>
-  API.delete(`/projects/${projectId}/tasks/${taskId}`);
+export const deleteAccount = () => API.delete("/users/profile");
 
 
 export const getAllProjects = async () => {
@@ -43,4 +48,41 @@ export const getAllProjects = async () => {
   return Array.isArray(res.data) ? res.data : [];
 };
 
-export const getAllTasks = () => API.get("/projects/tasks");
+export const createProject = (data: { name: string; status: string }) =>
+  API.post("/projects", data);
+
+export const updateProject = (
+  id: string,
+  data: { name?: string; status?: string }
+) => API.put(`/projects/${id}`, data);
+
+export const deleteProject = (id: string) => API.delete(`/projects/${id}`);
+
+export const getAllTasks = async () => {
+  const res = await API.get("/projects/tasks");
+  return res.data?.tasks || [];
+};
+
+
+export const getTasksByProjectId = async (projectId: string) => {
+  const res = await API.get(`/projects/${projectId}/tasks`);
+  return res.data.tasks || [];
+};
+
+
+export const createTask = (
+  projectId: string,
+  data: { name: string; status?: string }
+) => API.post(`/projects/${projectId}/tasks`, data);
+
+export const updateTask = (
+  projectId: string,
+  taskId: string,
+  data: { name?: string; status?: string }
+) => API.put(`/projects/${projectId}/tasks/${taskId}`, data);
+
+export const deleteTask = (projectId: string, taskId: string) =>
+  API.delete(`/projects/${projectId}/tasks/${taskId}`);
+
+// Export API instance for direct use if needed
+export default API;
