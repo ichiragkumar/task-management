@@ -28,7 +28,8 @@ export default function TaskForm({ projectId, existing, onClose }: Props) {
       }
       setError(null);
 
-      const data = { title, status };
+      const data = { name: title, status };
+
 
       if (existing) {
         await updateTask(projectId, existing.id, data);
