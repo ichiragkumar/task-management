@@ -1,6 +1,4 @@
----
-
-```markdown
+````markdown
 # 🧠 Task Management System
 
 A scalable and extensible full-stack task management system with JWT authentication, Kafka event streaming, Redis caching, PostgreSQL with Prisma, and a modern Vite + React frontend.
@@ -9,6 +7,9 @@ A scalable and extensible full-stack task management system with JWT authenticat
 
 ## 📦 Project Structure
 
+<!-- You can insert your folder structure or diagram here -->
+
+---
 
 ## ✨ Features
 
@@ -92,11 +93,16 @@ npm run dev
 
 ---
 
+## 🎥 Demo Video
+
+[![Task Management Demo](https://img.youtube.com/vi/dcC4qJIKlko/0.jpg)](https://www.youtube.com/watch?v=dcC4qJIKlko)
+
+---
+
 ## 📬 Follow me
 
 Made with ❤️ by [Chirag Kumar](https://x.com/imchiragkumar)
 
 * 📫 Telegram: [@ichiragkumar](https://t.me/ichiragkumar)
 * 💼 GitHub: [github.com/ichiragkumar](https://github.com/ichiragkumar/task-management)
-
----
+```
