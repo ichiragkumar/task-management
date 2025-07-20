@@ -7,7 +7,7 @@ export const getAllTasks = async (req: Request, res: Response) => {
   try {
 
     const cached = await redisClient.get(CACHE_KEY_TASKS);
-    console.log("Cache for tasks:", cached);
+
 
     if (cached) {
       const parsed = JSON.parse(cached);
@@ -19,12 +19,8 @@ export const getAllTasks = async (req: Request, res: Response) => {
       }
     }
 
-    console.log("Cache not found or invalid, fetching from DB");
-
 
     const tasks = await prisma.task.findMany({});
-
-    console.log("Tasks from DB", tasks);
 
     if (!tasks || tasks.length === 0) {
       return res.status(404).json({ error: "No tasks found" });

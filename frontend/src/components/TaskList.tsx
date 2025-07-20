@@ -33,11 +33,10 @@ export default function TaskList({ projectId }: { projectId: string }) {
   const [statusFilter, setStatusFilter] = useState("all");
   const [showAddForm, setShowAddForm] = useState(false);
 
-  // Fixed: Use more specific query key to avoid conflicts
   const { data: tasks = [], isLoading } = useQuery({
-    queryKey: ["projects", projectId], // Changed from ["tasks", projectId]
+    queryKey: ["projects", projectId, "tasks"], // More specific key for tasks
     queryFn: () => getTasksByProjectId(projectId),
-    enabled: !!projectId, // Only run query if projectId exists
+    enabled: !!projectId,
   });
 
   const createMutation = useMutation({
@@ -58,10 +57,14 @@ export default function TaskList({ projectId }: { projectId: string }) {
       setNewTaskName("");
       setNewTaskStatus("PENDING");
       setShowAddForm(false);
-      // Fixed: Only invalidate the specific project's tasks
-      queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] });
-      // Also invalidate all tasks if you have a global tasks view
-      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
+      // Invalidate specific project's tasks
+      queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "tasks"],
+      });
+      // Consider if you need to invalidate a broader "projects" key here.
+      // If "projects" query includes tasks count for all projects, then yes.
+      // Otherwise, it might be unnecessary.
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
     onError: (error: any) =>
       toast({
@@ -87,10 +90,10 @@ export default function TaskList({ projectId }: { projectId: string }) {
         description: "Task updated successfully",
       });
       setEditingTask(null);
-      // Fixed: Only invalidate the specific project's tasks
-      queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] });
-      // Also invalidate all tasks if you have a global tasks view
-      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
+      queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "tasks"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
     onError: () =>
       toast({
@@ -107,9 +110,9 @@ export default function TaskList({ projectId }: { projectId: string }) {
         title: "Success",
         description: "Task deleted successfully",
       });
-      // Fixed: Only invalidate the specific project's tasks
-      queryClient.invalidateQueries({ queryKey: ["projects", projectId] });
-      // Also invalidate all tasks if you have a global tasks view
+      queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "tasks"],
+      });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
     onError: () =>
@@ -129,7 +132,7 @@ export default function TaskList({ projectId }: { projectId: string }) {
       case "PENDING":
         return <Clock className="h-4 w-4 text-yellow-600" />;
       case "ACTIVE":
-        return <AlertCircle className="h-4 w-4 text-green-600" />;
+        return <AlertCircle className="h-4 w-4 text-green-600" />; // Assuming ACTIVE is similar to IN_PROGRESS or COMPLETED
       case "ARCHIVED":
         return <Archive className="h-4 w-4 text-gray-600" />;
       default:
@@ -175,19 +178,14 @@ export default function TaskList({ projectId }: { projectId: string }) {
     pending: tasks.filter((t: any) => t.status === "PENDING").length,
   };
 
-  if (!isLoading && tasks.length === 0) {
-  return (
-    <div className="flex items-center justify-center py-8">
-      <div className="text-center">
-        <CheckSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-        <p className="text-sm text-muted-foreground">
-          No tasks yet. Add your first task above.
-        </p>
+  // Only show loading state for the *entire* component if tasks are being fetched
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-10">
+        <p className="text-muted-foreground">Loading tasks...</p>
       </div>
-    </div>
-  );
-}
-
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -307,14 +305,14 @@ export default function TaskList({ projectId }: { projectId: string }) {
         </select>
       </div>
 
-      {/* Task List */}
+      {/* Task List (or No Tasks Message) */}
       <div className="space-y-2">
         {filteredTasks.length === 0 ? (
           <div className="text-center py-6 text-muted-foreground">
             <CheckSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">
               {tasks.length === 0
-                ? "No tasks yet. Add your first task above."
+                ? "No tasks yet. Use the 'Add New Task' button above to create one."
                 : "No tasks match the current filter."}
             </p>
           </div>

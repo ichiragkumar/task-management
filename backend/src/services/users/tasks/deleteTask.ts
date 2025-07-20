@@ -18,8 +18,6 @@ export const deleteTask = async (req: Request, res: Response) => {
       },
     });
 
-    console.log("ProjectIdExists", ProjectIdExists);
-
 
     if (!ProjectIdExists) {
       res.status(404).json({ error: "Project not found" });

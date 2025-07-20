@@ -12,18 +12,16 @@ export const createTask = async (req: Request, res: Response) => {
 
     const { name, status } = req.body;
 
-    console.log("i am here", projectId);
     if (!projectId) {
       res.status(400).json({ error: "Project id is required" });
       return;
     }
 
-    console.log("name and status", name, status);
 
     const ProjectIdExists = await prisma.project.findUnique({
       where: { id:projectId },
     });
-    console.log("ProjectIdExists", ProjectIdExists);
+
 
     if (!ProjectIdExists) {
       res.status(404).json({ error: "Project not found" });
@@ -43,7 +41,6 @@ export const createTask = async (req: Request, res: Response) => {
     await emitProjectTaskEvent(KAFKA_PROJECT_TASKS_EVENTS.CREATED, task);
     res.status(201).json(task);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Internal Server Error: createTask" });
   }
 };
