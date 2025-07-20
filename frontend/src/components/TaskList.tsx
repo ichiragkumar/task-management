@@ -33,9 +33,11 @@ export default function TaskList({ projectId }: { projectId: string }) {
   const [statusFilter, setStatusFilter] = useState("all");
   const [showAddForm, setShowAddForm] = useState(false);
 
+  // Fixed: Use more specific query key to avoid conflicts
   const { data: tasks = [], isLoading } = useQuery({
-    queryKey: ["tasks", projectId],
+    queryKey: ["projects", projectId], // Changed from ["tasks", projectId]
     queryFn: () => getTasksByProjectId(projectId),
+    enabled: !!projectId, // Only run query if projectId exists
   });
 
   const createMutation = useMutation({
@@ -56,8 +58,10 @@ export default function TaskList({ projectId }: { projectId: string }) {
       setNewTaskName("");
       setNewTaskStatus("PENDING");
       setShowAddForm(false);
-      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      // Fixed: Only invalidate the specific project's tasks
+      queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] });
+      // Also invalidate all tasks if you have a global tasks view
+      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
     },
     onError: (error: any) =>
       toast({
@@ -83,8 +87,10 @@ export default function TaskList({ projectId }: { projectId: string }) {
         description: "Task updated successfully",
       });
       setEditingTask(null);
-      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      // Fixed: Only invalidate the specific project's tasks
+      queryClient.invalidateQueries({ queryKey: ["project-tasks", projectId] });
+      // Also invalidate all tasks if you have a global tasks view
+      queryClient.invalidateQueries({ queryKey: ["all-tasks"] });
     },
     onError: () =>
       toast({
@@ -101,8 +107,10 @@ export default function TaskList({ projectId }: { projectId: string }) {
         title: "Success",
         description: "Task deleted successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      // Fixed: Only invalidate the specific project's tasks
+      queryClient.invalidateQueries({ queryKey: ["projects", projectId] });
+      // Also invalidate all tasks if you have a global tasks view
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
     onError: () =>
       toast({
@@ -167,16 +175,19 @@ export default function TaskList({ projectId }: { projectId: string }) {
     pending: tasks.filter((t: any) => t.status === "PENDING").length,
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-sm text-muted-foreground">Loading tasks...</p>
-        </div>
+  if (!isLoading && tasks.length === 0) {
+  return (
+    <div className="flex items-center justify-center py-8">
+      <div className="text-center">
+        <CheckSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
+        <p className="text-sm text-muted-foreground">
+          No tasks yet. Add your first task above.
+        </p>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
 
   return (
     <div className="space-y-4">

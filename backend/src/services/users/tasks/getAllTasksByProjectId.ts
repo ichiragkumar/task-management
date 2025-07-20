@@ -1,41 +1,43 @@
 import { Request, Response } from "express";
 import prisma from "../../../config/prismaClient";
 import redisClient from "../../../redis/redisClient";
-import { CACHE_KEY_TASKS } from "../../../config/types";
 
 
 export const getAllTasksByProjectId = async (req: Request, res: Response) => {
   try {
-
-
     const { projectId } = req.params;
 
+    if (!projectId) {
+      return res.status(400).json({ error: "projectId is required" });
+    }
 
-    const cached = await redisClient.get(CACHE_KEY_TASKS);
+
+    const cacheKey = `tasks:${projectId}`;
+
+
+    const cached = await redisClient.get(cacheKey);
 
     if (cached) {
       const parsed = JSON.parse(cached);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return res.status(200).json({
-          msg: "success (from cache): All tasks",
-          tasks: parsed,
-        });
-      }
+      return res.status(200).json({
+        msg: "success (from cache): Project-specific tasks",
+        tasks: parsed,
+      });
     }
 
 
     const tasks = await prisma.task.findMany({
       where: { projectId },
+      orderBy: { createdAt: "desc" },
     });
 
-    if (!tasks || tasks.length === 0) {
-      return res.status(404).json({ error: "No tasks found for this project" });
+
+    if (tasks.length > 0) {
+      await redisClient.setEx(cacheKey, 60, JSON.stringify(tasks));
     }
 
-    await redisClient.setEx(CACHE_KEY_TASKS, 60, JSON.stringify(tasks)); 
-
     return res.status(200).json({
-      msg: "success: All tasks",
+      msg: "success: Project-specific tasks",
       tasks,
     });
   } catch (error) {
