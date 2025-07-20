@@ -19,7 +19,8 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "kafkajs": "^2.2.4",
-    "redis": "^5.6.0"
+    "redis": "^5.6.0",
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

@@ -13,21 +13,34 @@ type Props = {
   onClose: () => void;
 };
 
+const PRIORITY_OPTIONS = ["LOW", "MEDIUM", "HIGH"] as const;
+
 export default function ProjectForm({ existing, onClose }: Props) {
   const [name, setName] = useState("");
   const [status, setStatus] = useState("IN_PROGRESS");
+  const [description, setDescription] = useState("");
+  const [deadline, setDeadline] = useState("");
+  const [priority, setPriority] = useState("MEDIUM");
+  const [clientName, setClientName] = useState("");
   const [errors, setErrors] = useState<{ name?: string }>({});
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Initialize form with existing data
   useEffect(() => {
     if (existing) {
       setName(existing.name || "");
       setStatus(existing.status || "IN_PROGRESS");
+      setDescription(existing.description || "");
+      setDeadline(existing.deadline?.slice(0, 10) || "");
+      setPriority(existing.priority || "MEDIUM");
+      setClientName(existing.clientName || "");
     } else {
       setName("");
       setStatus("IN_PROGRESS");
+      setDescription("");
+      setDeadline("");
+      setPriority("MEDIUM");
+      setClientName("");
     }
     setErrors({});
   }, [existing]);
@@ -40,10 +53,19 @@ export default function ProjectForm({ existing, onClose }: Props) {
       }
       setErrors({});
 
+      const payload = {
+        name,
+        status,
+        description,
+        deadline,
+        priority,
+        clientName,
+      };
+
       if (existing) {
-        await updateProject(existing.id, { name, status });
+        await updateProject(existing.id, payload);
       } else {
-        await createProject({ name, status });
+        await createProject(payload);
       }
     },
     onSuccess: () => {
@@ -92,7 +114,7 @@ export default function ProjectForm({ existing, onClose }: Props) {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2 }}
-          className="w-full max-w-md"
+          className="w-full max-w-lg"
           onClick={(e) => e.stopPropagation()}
         >
           <Card>
@@ -122,12 +144,7 @@ export default function ProjectForm({ existing, onClose }: Props) {
                   <Input
                     type="text"
                     value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                      if (errors.name) {
-                        setErrors({ ...errors, name: undefined });
-                      }
-                    }}
+                    onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Dashboard Redesign"
                     className={errors.name ? "border-destructive" : ""}
                     disabled={mutation.isPending}
@@ -140,12 +157,68 @@ export default function ProjectForm({ existing, onClose }: Props) {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
+                    Description
+                  </label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full rounded-md border border-input bg-background p-2 text-sm"
+                    placeholder="Enter project description"
+                    disabled={mutation.isPending}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">
+                    Deadline
+                  </label>
+                  <Input
+                    type="date"
+                    value={deadline}
+                    onChange={(e) => setDeadline(e.target.value)}
+                    disabled={mutation.isPending}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">
+                    Priority
+                  </label>
+                  <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                    className="w-full border border-input rounded-md px-3 py-2 text-sm"
+                    disabled={mutation.isPending}
+                  >
+                    {PRIORITY_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option.charAt(0) + option.slice(1).toLowerCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">
+                    Client Name
+                  </label>
+                  <Input
+                    type="text"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    placeholder="Client Co."
+                    disabled={mutation.isPending}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">
                     Status
                   </label>
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full border border-input rounded-md px-3 py-2 text-sm"
                     disabled={mutation.isPending}
                   >
                     <option value="PENDING">Pending</option>

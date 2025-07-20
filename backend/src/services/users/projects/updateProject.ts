@@ -8,13 +8,18 @@ export const updateProject = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    // add zod validation
+    if (req.body.deadline) {
+      req.body.deadline = new Date(req.body.deadline);
+    }
+
     const updatedProject = await prisma.project.update({
       where: { id },
       data: req.body,
     });
+
     await redisClient.del(CACHE_KEY);
     await emitProjectEvent(KAFKA_PROJECT_EVENTS.UPDATED, updatedProject);
+
     res.status(200).json(updatedProject);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error: updateProject" });
